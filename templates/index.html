@@ -1,0 +1,63 @@
+
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ selectedvideo }}</h1>
+    <div>
+    <div style="float: left">
+      <div>
+          <select name="cars" id="cars">
+
+          </select>
+      </div>
+      <div>
+          <form action="/playvideo" method="POST" id="form">
+              <select name="selected_class" class="form-control" size="5" id="file-id">
+                  {% for item, value in video_files.items() %}
+                    <option value="{{ item }}"> {{ value }} </option>
+                  {% endfor %}
+
+              </select>
+              <div>
+              <button class="form-control" id="button">Play video</button>
+              </div>
+
+          </form>
+        </div>
+        <div>
+            <form id="form_res" class="form-inline">
+                <div>
+              <button type="submit" class="form-c" id="get-result">Results</button>
+              </div>
+
+               <div id="output">qq</div>
+            </form>
+
+        </div>
+
+    </div>
+        </div>
+    <div style="float: right">
+        <img id="bg" src="{{ url_for('video_feed') }}">
+    </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+     $('#form_res').on('submit', function(event) {
+       $.ajax({
+          data : {
+             firstName : 'test',
+             lastName: 'test2',
+                 },
+             type : 'POST',
+             url : '/result'
+            })
+        .done(function(data) {
+
+          $('#output').text(data.output).show();
+      });
+      event.preventDefault();
+      });
+});
+</script>
+ {% endblock %}
