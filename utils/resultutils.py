@@ -2,15 +2,65 @@ import numpy as np
 from utils import metricutils
 from config import config
 
+class BoundingBox:
+    def __init__(self, bbox):
+        self.xmin = bbox.xmin
+        self.ymin = bbox.ymin
+        self.xmax = bbox.xmax
+        self.ymax = bbox.ymax
+
+    def __eq__(self, other):
+        if metricutils.bb_intersection_over_union(self, other) >= config.IOU_THRESHOLD:
+            return True
+        return False
+
+
 class InferenceResult:
     def __init__(self):
+        self.init_object()
+        self.average_precisions = []
+
+    def init_object(self):
         self.ground_truth_total = 0
         self._true_positives = []
-        self.number_of_images = 0
         self._false_negatives = []
         self._false_positives = []
         self._false_positives_total = 0
+        self._false_negatives_total = 0
         self._true_positives_total = 0
+
+
+    @property
+    def accuracy(self):
+        accuracy_val = (self._true_positives_total/self.ground_truth_total) * 100
+        return round(accuracy_val, 3)
+
+    @property
+    def recall(self):
+
+        return round(self._true_positives_total / self.ground_truth_total, 3)
+
+    @property
+    def FN_total(self):
+        return sum(1 - np.array(self._true_positives))
+        # return np.count_nonzero(1 - np.array(self._true_positives))
+
+    @property
+    def TP_total(self):
+        return sum(self._true_positives)
+
+
+    @property
+    def FP_total(self):
+        pass
+
+    @property
+    def precision(self):
+        return round(self._true_positives_total/ (self._true_positives_total + self._false_positives_total), 3)
+
+    @property
+    def mean_average_precision(self):
+        pass
 
     @property
     def true_positives(self):
@@ -41,22 +91,50 @@ class InferenceResult:
 
     def compare_boxes(self, boxes_ground_truth, boxes_prediction):
 
-        matches_true_positives = []
+        self.add_ground_truths(len(boxes_ground_truth))
 
-        for elem_gt in boxes_ground_truth:
-            matched = False
-            for idx, elem_res in enumerate(boxes_prediction):
-                iou = metricutils.bb_intersection_over_union(elem_gt.bbox, elem_res.bbox)
-                if iou >= config.IOU_THRESHOLD:
-                    matched = True
+        ground_truth_objects = [BoundingBox(item.bbox) for item in boxes_ground_truth]
+        ground_truth_objects.sort(key=lambda x: x.xmin)
+
+        prediction_objects = [BoundingBox(item.bbox) for item in boxes_prediction]
+        prediction_objects.sort(key=lambda x: x.xmin)
+
+        for gtidx, ground_truth in enumerate(ground_truth_objects):
+
+            if len(prediction_objects) == 0:
+                return
+            for idx, prediction in enumerate(prediction_objects):
+                if ground_truth == prediction:
                     self.add_true_positives_number(1)
-                    del boxes_prediction[idx]
+                    self._true_positives.append(1)
+
+                    del prediction_objects[idx]
+                    del ground_truth_objects[gtidx]
                     break
-            matches_true_positives.append(1 if matched else 0)
-        self.add_true_positives(matches_true_positives)
+            else:
+                self._true_positives.append(0)
+        self._false_negatives_total += len(ground_truth_objects)
+        self._false_positives_total += len(prediction_objects)
+
+            # for idx, prediction in enumerate(boxes_prediction):
+                # iou = metricutils.bb_intersection_over_union(ground_truth_box.bbox, prediction.bbox)
+
+                # if iou >= config.IOU_THRESHOLD:
+                #     matched = True
+                #     self.add_true_positives_number(1)
+                #     del boxes_prediction[idx]
+
+
+
+        #     matches_true_positives.append(1 if matched else 0)
+        # self.add_true_positives(matches_true_positives)
 
 
     def __repr__(self):
-        return f"Ground truth total: {self.ground_truth_total}, " \
-               f"Number of images: {self.number_of_images}," \
-               f"True positives: {self._true_positives_total} "
+        return f"<br><br>Ground truth total: {self.ground_truth_total}, <br>True positives: {self._true_positives_total}, " \
+               f"<br><b>Accuracy</b>: {self.accuracy}% <br><b>Recall</b>: {self.recall} "
+
+    def __str__(self):
+        return f"Accuracy: {self.accuracy}, precision: {self.precision} , " \
+               f"true_positives: {self._true_positives}\n recall: {self.recall}, \n " \
+               f"number of false neg {self.FN_total},  true positives {self.TP_total}"

@@ -25,6 +25,7 @@ class GroundTruthAnnotation:
         self.id = 0
         self.score = 1
 
+
 class GroundTruth:
     def __init__(self, file_xml):
 
@@ -54,12 +55,9 @@ class GroundTruth:
 
                 lst = [int(item) for item in lst]
                 bbox = GroundTruthAnnotation(lst[0], lst[1], lst[2], lst[3])
-                # bbox.Label = obj['label']
+
                 bbox.Label = 'Person'
                 self.objects.append(bbox)
-
-
-
 
 
 if __name__ == '__main__':
