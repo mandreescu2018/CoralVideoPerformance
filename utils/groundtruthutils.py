@@ -2,6 +2,7 @@ import os
 import abc
 import xml.etree.ElementTree as ET
 
+
 class BBox:
     def __init__(self, xmin, ymin, xmax, ymax):
         self.xmin = int(xmin)
