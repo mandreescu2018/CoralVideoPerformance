@@ -10,7 +10,7 @@ from pycoral.adapters.common import input_size
 from pycoral.utils.edgetpu import run_inference
 
 from pathlib import Path
-from utils import xmlutils, resultutils, metricutils, newresultutils
+from utils import xmlutils, resultutils, metricutils, newresultutils, groundtruthutils
 from config import config
 from config import settings
 
@@ -112,21 +112,15 @@ def main_run(video_file):
 
             height, width, channels = cv2_im.shape
             scale_x, scale_y = width / inference_size[0], height / inference_size[1]
-            # scalled_bboxes = []
-            # for item in objs:
-            #     bbox = item.bbox.scale(scale_x, scale_y)
-            #     scalled_bboxes.append(bbox)
-
-            class BboxObj:
-                pass
 
             scalled_bboxes = []
             for item in objs:
                 bbox = item.bbox.scale(scale_x, scale_y)
-                BB = BboxObj()
-                setattr(BB, 'bbox', bbox)
+                BB = groundtruthutils.GroundTruthItem(bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax, item.score)
+                # BB = BboxObj()
+                # setattr(BB, 'bbox', bbox)
                 setattr(BB, 'id', item.id)
-                setattr(BB, 'score', item.score)
+                # setattr(BB, 'score', item.score)
                 scalled_bboxes.append(BB)
 
             inf_res.store_boxes(ground_truth_object.objects, scalled_bboxes, file_name_for_metrics, scale=True)
