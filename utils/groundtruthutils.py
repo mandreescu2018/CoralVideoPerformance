@@ -1,35 +1,33 @@
 import os
+import glob
 import abc
 import xml.etree.ElementTree as ET
+import json
+from config import settings
+from utils.boundingboxutils import BoundingBoxItem
 
+settings.init()
 
-class BBox:
-    def __init__(self, xmin, ymin, xmax, ymax):
-        self.xmin = int(xmin)
-        self.ymin = int(ymin)
-        self.xmax = int(xmax)
-        self.ymax = int(ymax)
+def get_data(images_path, gt_path):
+    all_img_files_list = []
+    all_json_files_list = []
+    # val_path_img = conf.Images_path
+    val_path_img = os.path.join(settings.home_path, images_path)
+    # val_path_json = conf.Json_ground_truth_path
+    val_path_json = os.path.join(settings.home_path, gt_path)
 
-    def __str__(self):
-        return f"x min: {self.xmin}, y min: {self.ymin}, x max: {self.xmax}, y max: {self.ymax}"
+    for every_folder in os.walk(val_path_img):
+        temp_list = [f for f in glob.glob(os.path.join(every_folder[0], '*.png'))]
+        temp_list.sort()
+        all_img_files_list += temp_list
+    for every_folder in os.walk(val_path_json):
+        temp_list = [f for f in glob.glob(os.path.join(every_folder[0], '*.json'))]
+        temp_list.sort()
+        all_json_files_list += temp_list
 
-    def coordinates_list(self):
-        return list((self.xmin, self.ymin, self.xmax, self.ymax))
-
-
-class GroundTruthItem:
-    def __init__(self, xmin, ymin, xmax, ymax, score, frame_no = 0):
-        self.bbox = BBox(xmin, ymin, xmax, ymax)
-        self.frame_no = int(frame_no)
-        self.label = ''
-        self.score = score
-
-    def to_list(self):
-        return [self.bbox.xmin, self.bbox.ymin, self.bbox.xmax, self.bbox.ymax]
-
-    def __repr__(self):
-        return str(self.bbox) + f" frame: {self.frame_no} \n"
-
+    print(len(all_img_files_list))
+    print(len(all_json_files_list))
+    return all_img_files_list, all_json_files_list
 
 class GroundTruth:
     def __init__(self, path):
@@ -59,7 +57,7 @@ class GroundTruthXml(GroundTruth):
             for child in box:
                 lst.append(child.text)
             lst = [int(item) for item in lst]
-            bbox = GroundTruthItem(*lst[0:4])
+            bbox = BoundingBoxItem(*lst[0:4])
             self.gt_items.append(bbox)
 
 
@@ -85,8 +83,29 @@ class GroundTruthTxt(GroundTruth):
         with open(self.path) as fl:
             for line in fl:
                 lst = line.split(' ')
-                self.gt_items.append(GroundTruthItem(*lst[1:6]))
+                self.gt_items.append(BoundingBoxItem(*lst[1:6]))
 
 class GroundTruthJSON(GroundTruth):
     def __init__(self, path):
         super().__init__(path)
+        with open(self.path, 'r') as j:
+            json_data = json.load(j)
+
+        self.json_data = json_data
+        self.parse_json()
+
+    def parse_json(self):
+        for obj in self.json_data['objects']:
+            if obj['label'] not in ['pedestrian', 'rider', 'sitting person']:
+                continue
+            lst = obj['bbox']
+            # self.xmin = xmin
+            # self.ymin = ymin
+            # self.xmax = self.xmin + xoffset
+            # self.ymax = self.ymin + yoffset
+
+            lst[2] = lst[0] + lst[2]
+            lst[3] = lst[1] + lst[3]
+            bbox = BoundingBoxItem(*lst[0:4])
+            bbox.Label = obj['label']
+            self.gt_items.append(bbox)

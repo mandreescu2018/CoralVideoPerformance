@@ -2,6 +2,7 @@
 from copy import deepcopy
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 
 class InferenceRes:
 
@@ -36,6 +37,11 @@ class InferenceRes:
     def calculate_mean_average_precision(self):
         data = self.get_avg_precision_at_iou(iou_thr=0.5)
         print('avg precision in class: {:.4f}'.format(data['avg_prec']))
+        with open('data_gt.json', 'w') as fp:
+            json.dump(self.gt_boxes, fp)
+
+        with open('data_pred.json', 'w') as fp:
+            json.dump(self.pred_boxes, fp)
 
     def plot_pr_curve(self, precisions, recalls, category='Person', label=None, color=None, ax=None):
         """Simple plotting helper function"""
@@ -311,8 +317,9 @@ class InferenceRes:
             raise AssertionError(
                 "Prediction box is malformed? pred box: {}".format(pred_box))
         if (x1_t > x2_t) or (y1_t > y2_t):
-            raise AssertionError(
-                "Ground Truth box is malformed? true box: {}".format(gt_box))
+            print("Ground Truth box is malformed? true box: {}".format(gt_box))
+            # raise AssertionError(
+            #     "Ground Truth box is malformed? true box: {}".format(gt_box))
 
         if (x2_t < x1_p or x2_p < x1_t or y2_t < y1_p or y2_p < y1_t):
             return 0.0

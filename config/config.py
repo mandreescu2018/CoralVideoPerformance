@@ -1,10 +1,15 @@
 
 SET_TYPE = 'test'
 
-GROUND_TRUTH_PATH = './data/Walk-{}/Annotations/'.format(SET_TYPE)
+# GROUND_TRUTH_PATH = './data/Walk-{}/Annotations/'.format(SET_TYPE)
+GROUND_TRUTH_PATH = 'datasets/SHAD/Walk-{}/Annotations/'.format(SET_TYPE)
 GROUND_TRUTH_PATH += '{}'
 
-VIDEO_PATH = 'data/Walk-'+SET_TYPE+'/video/{}'
+IMAGES_PATH = "datasets/leftImg8bit_trainvaltest/leftImg8bit/val/"
+Json_ground_truth_path = "datasets/leftImg8bit_trainvaltest/gtBbox_cityPersons_trainval/gtBboxCityPersons/val"
+
+# VIDEO_PATH = 'data/Walk-'+SET_TYPE+'/video/{}'
+VIDEO_PATH = 'datasets/SHAD/Walk-'+SET_TYPE+'/video/{}'
 output = "./results/"
 
 default_model_dir = 'models'
@@ -15,5 +20,6 @@ default_labels = 'coco_labels.txt'
 
 # intersection over union minimum
 IOU_THRESHOLD = 0.5
+CORAL_THRESHOLD = 0.5
 
 
