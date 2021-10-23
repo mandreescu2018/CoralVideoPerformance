@@ -1,7 +1,7 @@
 
 SET_TYPE = 'test'
 HOME_PATH = '/home/mihai'
-# GROUND_TRUTH_PATH = './data/Walk-{}/Annotations/'.format(SET_TYPE)
+
 GROUND_TRUTH_PATH = 'datasets/SHAD/Walk-{}/Annotations/'.format(SET_TYPE)
 GROUND_TRUTH_PATH += '{}'
 
