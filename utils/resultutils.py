@@ -116,23 +116,11 @@ class InferenceResult:
         self._false_negatives_total += len(ground_truth_objects)
         self._false_positives_total += len(prediction_objects)
 
-            # for idx, prediction in enumerate(boxes_prediction):
-                # iou = metricutils.bb_intersection_over_union(ground_truth_box.bbox, prediction.bbox)
-
-                # if iou >= config.IOU_THRESHOLD:
-                #     matched = True
-                #     self.add_true_positives_number(1)
-                #     del boxes_prediction[idx]
-
-
-
-        #     matches_true_positives.append(1 if matched else 0)
-        # self.add_true_positives(matches_true_positives)
 
 
     def __repr__(self):
-        return f"<br><br>Ground truth total: {self.ground_truth_total}, <br>True positives: {self._true_positives_total}, " \
-               f"<br><b>Accuracy</b>: {self.accuracy}% <br><b>Recall</b>: {self.recall} "
+        return f"Ground truth total: {self.ground_truth_total}, True positives: {self._true_positives_total}, " \
+               f"Accuracy: {self.accuracy}% Recall: {self.recall} "
 
     def __str__(self):
         return f"Accuracy: {self.accuracy}, precision: {self.precision} , " \
