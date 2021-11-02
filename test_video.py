@@ -30,7 +30,7 @@ def main():
 
     for key, value in dict_videos.items():
         check_video(value)
-    inference_result.calculate_mean_average_precision()
+    # inference_result.calculate_mean_average_precision()
     inference_result.calculate_and_graph()
 
 

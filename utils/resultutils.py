@@ -49,18 +49,9 @@ class InferenceResult:
     def TP_total(self):
         return sum(self._true_positives)
 
-
-    @property
-    def FP_total(self):
-        pass
-
     @property
     def precision(self):
         return round(self._true_positives_total/ (self._true_positives_total + self._false_positives_total), 3)
-
-    @property
-    def mean_average_precision(self):
-        pass
 
     @property
     def true_positives(self):
