@@ -1,4 +1,7 @@
 
+import sys
+sys.path.append('..')
+
 import json
 import time
 from utils import newresultutils
