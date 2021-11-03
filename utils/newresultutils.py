@@ -34,15 +34,6 @@ class InferenceRes:
             self.pred_boxes[f_name]['scores'].append(item.score)
 
 
-    # def calculate_mean_average_precision(self):
-    #     data = self.get_avg_precision_at_iou(iou_thr=0.5)
-    #     print('avg precision in class: {:.4f}'.format(data['avg_prec']))
-    #     with open('data_gt.json', 'w') as fp:
-    #         json.dump(self.gt_boxes, fp)
-    #
-    #     with open('data_pred.json', 'w') as fp:
-    #         json.dump(self.pred_boxes, fp)
-
     def plot_pr_curve(self, precisions, recalls, category='Person', label=None, color=None, ax=None):
         """Simple plotting helper function"""
 
