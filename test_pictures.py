@@ -9,6 +9,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 from pycoral.adapters import common
 from pycoral.adapters import detect
 from pycoral.utils.edgetpu import make_interpreter
