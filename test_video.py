@@ -20,8 +20,8 @@ inference_result = newresultutils.InferenceRes()
 def get_video_files():
     files_path = os.path.join(settings.home_path, config.VIDEO_PATH.format(''))
     files = os.listdir(files_path)
-    dictFiles = {i: files[i].rsplit('.', 1)[0] for i in range(0, len(files))}
-    return dictFiles
+    video_files_dict = {i: files[i].rsplit('.', 1)[0] for i in range(0, len(files))}
+    return video_files_dict
 
 
 def main():
@@ -40,9 +40,9 @@ def check_video(video_file):
     video_path = os.path.join(settings.home_path, config.VIDEO_PATH.format(video_file +'.mp4'))
     cap = cv2.VideoCapture(video_path)
 
-    labels = os.path.join(config.default_labels_dir, config.default_labels)
+    # labels = os.path.join(config.default_labels_dir, config.default_labels)
 
-    labels = read_label_file(labels) if labels else {}
+    # labels = read_label_file(labels) if labels else {}
     interpreter = make_interpreter(model)
     interpreter.allocate_tensors()
     inference_size = input_size(interpreter)
@@ -71,7 +71,10 @@ def check_video(video_file):
             cv2_im_rgb = cv2.cvtColor(cv2_im, cv2.COLOR_BGR2RGB)
             cv2_im_rgb = cv2.resize(cv2_im_rgb, inference_size)
             run_inference(interpreter, cv2_im_rgb.tobytes())
-            objs = detect.get_objects(interpreter, 0.4)[:11]
+            objs = detect.get_objects(interpreter, 0.4)
+
+            # interest for persons only (see coco_labels.txt)
+            objs = [item for item in objs if item.id == 0]
 
             height, width, channels = cv2_im.shape
             scale_x, scale_y = width / inference_size[0], height / inference_size[1]
@@ -87,7 +90,8 @@ def check_video(video_file):
 
     cap.release()
     cv2.destroyAllWindows()
-    print(repr(settings.inference_result))
+    # print(repr(settings.inference_result))
+    print(repr(inference_result))
 
 
 def rescale_bbox(cv2_im, inference_size, objs):

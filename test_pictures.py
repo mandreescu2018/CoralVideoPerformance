@@ -18,17 +18,15 @@ from utils import newresultutils, groundtruthutils, boundingboxutils
 
 from config import config
 
-inf_res = newresultutils.InferenceRes()
+inference_result = newresultutils.InferenceRes()
 
 def main():
 
-    # labels = read_label_file(conf.labels)
     model = os.path.join(config.default_model_dir, config.default_model)
     interpreter = make_interpreter(model)
     interpreter.allocate_tensors()
 
     images, jsons = groundtruthutils.get_data(config.IMAGES_PATH, config.Json_ground_truth_path)
-    # Res.number_of_images = len(images)
 
     for index_img in range(len(images)):
         image = Image.open(images[index_img])
@@ -40,6 +38,7 @@ def main():
         interpreter.invoke()
         objs = detect.get_objects(interpreter, config.CORAL_THRESHOLD, scale)
 
+        # interest for persons only
         objs = [item for item in objs if item.id == 0]
 
         boxes_result = []
@@ -55,11 +54,11 @@ def main():
         if len(ground_truth_annotations.gt_items) == 0:
             continue
 
-        inf_res.store_boxes(ground_truth_annotations.gt_items, boxes_result, os.path.basename(images[index_img]), scale=True)
-
+        inference_result.store_boxes(ground_truth_annotations.gt_items, boxes_result, os.path.basename(images[index_img]), scale=True)
+        print(repr(inference_result))
         # image.save(os.path.join(conf.output, 'result_coral_' + os.path.basename(images[index_img])))
 
-    inf_res.calculate_and_graph()
+    inference_result.calculate_and_graph()
 
 
 if __name__ == '__main__':

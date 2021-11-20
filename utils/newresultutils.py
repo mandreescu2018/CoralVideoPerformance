@@ -288,3 +288,15 @@ class InferenceRes:
             fn = len(gt_boxes) - len(gt_match_idx)
 
         return {'true_pos': tp, 'false_pos': fp, 'false_neg': fn}
+
+    @property
+    def ground_truths(self):
+        return sum([len(self.gt_boxes[x]) for x in self.gt_boxes if isinstance(self.gt_boxes[x], list)])
+
+    @property
+    def predictions(self):
+        return sum([len(self.pred_boxes[x]["boxes"]) for x in self.pred_boxes])
+
+    def __repr__(self):
+        return f"Ground truth total: {self.ground_truths}, Predictions: {self.predictions} " #\
+               # f"Accuracy: {self.accuracy}% Recall: {self.recall} "
