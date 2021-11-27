@@ -31,6 +31,11 @@ def main():
     for index_img in range(len(images)):
         image = Image.open(images[index_img])
 
+        json_file = jsons[index_img]
+        ground_truth_annotations = groundtruthutils.GroundTruthJSON(json_file)
+        if len(ground_truth_annotations.gt_items) == 0:
+            continue
+
         _, scale = common.set_resized_input(
             interpreter, image.size, lambda size: image.resize(size, Image.ANTIALIAS))
 
@@ -49,10 +54,7 @@ def main():
             BB.score = item.score
             boxes_result.append(BB)
 
-        json_file = jsons[index_img]
-        ground_truth_annotations = groundtruthutils.GroundTruthJSON(json_file)
-        if len(ground_truth_annotations.gt_items) == 0:
-            continue
+
 
         inference_result.store_boxes(ground_truth_annotations.gt_items, boxes_result, os.path.basename(images[index_img]), scale=True)
         print(repr(inference_result))
