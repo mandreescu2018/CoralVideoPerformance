@@ -1,7 +1,7 @@
 # import the necessary packages
 from flask import Flask, render_template, Response, redirect
 from flask import request, jsonify
-from utils.videoutils import VideoClipCoral, VideoClipCollection
+from junk_shop.videoutils import VideoClipCoral
 from config import config
 from config import settings
 import os
@@ -15,12 +15,14 @@ app.selected_video_h1 = video_name
 #     return app.selected_video
 
 def get_video_files():
-    files = os.listdir(config.VIDEO_PATH.format(''))
+    # files = os.listdir(config.VIDEO_PATH.format(''))
+    files_path = os.path.join(settings.home_path, config.VIDEO_PATH.format(''))
+    files = os.listdir(files_path)
     dictFiles = {i: files[i].rsplit('.', 1)[0] for i in range(0, len(files))}
     # print(dictFiles[2])
     return dictFiles
 
-
+settings.init()
 video_files = get_video_files()
 # video_files = ['SJTU-SEIEE-170_Walk_0006']
 
@@ -88,5 +90,6 @@ def play_videos():
 
 if __name__ == '__main__':
     settings.init()
+    video_files = get_video_files()
     # defining server ip address and port
     app.run(host='0.0.0.0', port=5000, debug=True)

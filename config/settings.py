@@ -1,5 +1,4 @@
-from utils import resultutils
-import os
+from junk_shop import resultutils
 from config import config
 global inference_result
 global home_path

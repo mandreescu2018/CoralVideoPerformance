@@ -6,7 +6,7 @@ import json
 import time
 from utils import newresultutils
 
-inference_result = newresultutils.InferenceRes()
+inference_result = newresultutils.InferenceRes("TEST")
 
 if __name__ == "__main__":
     start_time = time.time()

@@ -1,7 +1,10 @@
 # from test_boxes import calculate_mean_ap as cap
 from copy import deepcopy
 import numpy as np
+import tkinter
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('TkAgg')
 import json
 
 class InferenceRes:
@@ -12,8 +15,11 @@ class InferenceRes:
         '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
         '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
 
-    def __init__(self):
+    def __init__(self, dataset=None, model=''):
         self.init_object()
+        self.dataset_name = dataset
+        self.model_name = model
+
         # self.average_precisions = []
 
     def init_object(self):
@@ -34,7 +40,7 @@ class InferenceRes:
             self.pred_boxes[f_name]['scores'].append(item.score)
 
 
-    def plot_pr_curve(self, precisions, recalls, category='Person', label=None, color=None, ax=None):
+    def plot_pr_curve(self, precisions, recalls, average_precision=None, label=None, color=None, ax=None):
         """Simple plotting helper function"""
 
         if ax is None:
@@ -46,7 +52,8 @@ class InferenceRes:
         ax.scatter(recalls, precisions, label=label, s=20, color=color)
         ax.set_xlabel('recall')
         ax.set_ylabel('precision')
-        ax.set_title('Precision-Recall curve for {}'.format(category))
+        ax.set_title('Precision-Recall curve for {} '
+                     '\nMean average precision: {:.2f} \nModel: {}'.format(self.dataset_name, average_precision, self.model_name))
         ax.set_xlim([0.0, 1.3])
         ax.set_ylim([0.0, 1.2])
         return ax
@@ -62,8 +69,12 @@ class InferenceRes:
 
             precisions = data['precisions']
             recalls = data['recalls']
-            ax = self.plot_pr_curve(
-                precisions, recalls, label='{:.2f}'.format(iou_thr), color=self.COLORS[idx * 2], ax=ax)
+            ax = self.plot_pr_curve(precisions,
+                                    recalls,
+                                    label='{:.2f}'.format(iou_thr),
+                                    color=self.COLORS[idx * 2],
+                                    ax=ax,
+                                    average_precision=100 * np.mean(avg_precs))
 
         # prettify for printing:
         avg_precs = [float('{:.4f}'.format(ap)) for ap in avg_precs]
@@ -76,6 +87,7 @@ class InferenceRes:
             plt.vlines(xval, 0.0, 1.1, color='gray', alpha=0.3, linestyles='dashed')
         # end_time = time.time()
         # print('\nPlotting and calculating mAP takes {:.4f} secs'.format(end_time - start_time))
+        plt.savefig("mygraph.png")
         plt.show()
 
     def get_avg_precision_at_iou(self, iou_thr=0.5):

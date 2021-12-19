@@ -11,22 +11,18 @@ settings.init()
 def get_data(images_path, gt_path):
     all_img_files_list = []
     all_json_files_list = []
-    # val_path_img = conf.Images_path
-    val_path_img = os.path.join(settings.home_path, images_path)
-    # val_path_json = conf.Json_ground_truth_path
-    val_path_json = os.path.join(settings.home_path, gt_path)
 
-    for every_folder in os.walk(val_path_img):
+    for every_folder in os.walk(images_path):
         temp_list = [f for f in glob.glob(os.path.join(every_folder[0], '*.png'))]
         temp_list.sort()
         all_img_files_list += temp_list
-    for every_folder in os.walk(val_path_json):
+    for every_folder in os.walk(gt_path):
         temp_list = [f for f in glob.glob(os.path.join(every_folder[0], '*.json'))]
         temp_list.sort()
         all_json_files_list += temp_list
 
-    print(len(all_img_files_list))
-    print(len(all_json_files_list))
+    # print(len(all_img_files_list))
+    # print(len(all_json_files_list))
     return all_img_files_list, all_json_files_list
 
 class GroundTruth:
@@ -64,6 +60,7 @@ class GroundTruthXml(GroundTruth):
 class GroundTruthTxt(GroundTruth):
     def __init__(self, path):
         super().__init__(path)
+        self.read_file()
 
 
     def read_file(self):
@@ -83,7 +80,7 @@ class GroundTruthTxt(GroundTruth):
         with open(self.path) as fl:
             for line in fl:
                 lst = line.split(' ')
-                self.gt_items.append(BoundingBoxItem(*lst[1:6]))
+                self.gt_items.append(BoundingBoxItem(*lst[1:5], frame_no=lst[5], subject_out_of_frame=lst[6]))
 
 class GroundTruthJSON(GroundTruth):
     def __init__(self, path):
