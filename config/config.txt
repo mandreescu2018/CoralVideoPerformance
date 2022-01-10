@@ -1,20 +1,23 @@
 [GENERAL]
-HOME_PATH = /home/mihai
+HOME_PATH = D:\
 
-;MODEL_PATH = models/tf2_ssd_mobilenet_v2_coco17_ptq_edgetpu.tflite
-;MODEL_PATH = models/efficientdet_lite3_512_ptq_edgetpu.tflite
-MODEL_PATH = models/ssdlite_mobiledet_coco_qat_postprocess_edgetpu.tflite
+;MODEL_PATH = models\tf2_ssd_mobilenet_v2_coco17_ptq_edgetpu.tflite
+;MODEL_PATH = models\efficientdet_lite3_512_ptq_edgetpu.tflite
+;MODEL_PATH = models\ssdlite_mobiledet_coco_qat_postprocess_edgetpu.tflite
+;MODEL_PATH = models\ssd_mobilenet_v2_coco_quant_postprocess.tflite
+MODEL_PATH = models\efficientdet_lite1_384_ptq.tflite
+
 LABELS = labels/coco_labels.txt
 IOU_THRESHOLD = 0.5
 CORAL_THRESHOLD = 0.5
 
 [SHAD]
-DATA_PATH = datasets/SHAD/Walk-test/video/
-ANNOTATIONS_PATH = datasets/SHAD/Walk-test/Annotations/
+DATA_PATH = datasets\Walk-test\video\
+ANNOTATIONS_PATH = datasets\Walk-test\Annotations\
 
 [Cityscape]
 DATA_PATH = datasets/leftImg8bit_trainvaltest/leftImg8bit/val/
-ANNOTATIONS_PATH = datasets/leftImg8bit_trainvaltest/gtBbox_cityPersons_trainval/gtBboxCityPersons/val
+ANNOTATIONS_PATH = datasets\gtBboxCityPersons\val
 
 [EPFL]
 DATA_PATH = datasets/EPFL/Laboratory/Video

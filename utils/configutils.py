@@ -1,6 +1,7 @@
 import configparser
 import os
 
+
 class ConfigurationParser:
     def __init__(self, filename, section):
         self.filename = filename

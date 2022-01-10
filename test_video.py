@@ -11,20 +11,15 @@ from pycoral.adapters import common
 from pycoral.utils.edgetpu import run_inference
 
 from pathlib import Path
-from utils import newresultutils, groundtruthutils, boundingboxutils
+from utils import newresultutils, groundtruthutils, boundingboxutils, inferencecoralutils
 from utils.configutils import ConfigurationParser
 
 configuration = ConfigurationParser("config/config.txt", "SHAD")
 inference_result = newresultutils.InferenceRes(dataset='SHAD', model=configuration.model_path)
 
-def get_video_files():
-    files_path = os.path.join(configuration.home_path, configuration.data_path.format(''))
-    files = os.listdir(files_path)
-    video_files_dict = {i: files[i].rsplit('.', 1)[0] for i in range(0, len(files))}
-    return video_files_dict
 
 def main():
-    dict_videos = get_video_files()
+    dict_videos = groundtruthutils.get_video_files_shad(configuration)
     start = time.perf_counter()
     for key, value in dict_videos.items():
         check_video(value)
@@ -38,9 +33,7 @@ def check_video(video_file):
     video_path = os.path.join(configuration.home_path, configuration.data_path + video_file +'.mp4')
     cap = cv2.VideoCapture(video_path)
 
-    interpreter = make_interpreter(configuration.model_path)
-    interpreter.allocate_tensors()
-    inference_size = input_size(interpreter)
+    interpreter, inference_size = inferencecoralutils.initialize_interpreter(configuration.model_path)
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -51,6 +44,8 @@ def check_video(video_file):
         frame_number = cap.get(cv2.CAP_PROP_POS_FRAMES)
 
         xmlPath = os.path.join(configuration.home_path, configuration.annotations_path + video_file)
+
+        # ===============================================
         xmlpath = Path(xmlPath)
 
         file_name = video_file + '-{}.xml'
@@ -61,16 +56,23 @@ def check_video(video_file):
         f_name = f_name.replace(os.sep, '/')
 
         ground_truth = groundtruthutils.GroundTruthXml(f_name)
+        # ===============================================
+
+        ground_truth, file_name_for_metrics = groundtruthutils.get_annotation_by_video_frame(xmlPath, frame_number)
+        exit(0)
 
         if ground_truth.gt_items:
             cv2_im_rgb = cv2.cvtColor(cv2_im, cv2.COLOR_BGR2RGB)
             cv2_im_rgb = cv2.resize(cv2_im_rgb, inference_size)
-            run_inference(interpreter, cv2_im_rgb.tobytes())
 
-            objs = detect.get_objects(interpreter, configuration.coral_threshold)
+            # run_inference(interpreter, cv2_im_rgb.tobytes())
+            #
+            # objs = detect.get_objects(interpreter, configuration.coral_threshold)
+            #
+            # # interest for persons only (see coco_labels.txt)
+            # objs = [item for item in objs if item.id == 0]
 
-            # interest for persons only (see coco_labels.txt)
-            objs = [item for item in objs if item.id == 0]
+            objs = inferencecoralutils.make_inference_on_frame(interpreter, cv2_im_rgb)
 
             height, width, channels = cv2_im.shape
             scale_x, scale_y = width / inference_size[0], height / inference_size[1]
