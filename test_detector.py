@@ -1,3 +1,4 @@
+
 import tensorflow_hub as hub
 import cv2
 import numpy
@@ -5,13 +6,13 @@ import tensorflow as tf
 import pandas as pd
 from utils import inferenceutils
 
-# Carregar modelos
+
 detector = hub.load("https://tfhub.dev/tensorflow/efficientdet/lite2/detection/1")
 # detector = hub.load("https://tfhub.dev/tensorflow/ssd_mobilenet_v2/2")
 labels = pd.read_csv('labels/labels.csv', sep=';', index_col='ID')
 labels = labels['OBJECT (2017 REL.)']
 
-cap = cv2.VideoCapture('/home/mihai/datasets/SHAD/Walk-test/video/SJTU-SEIEE-170_Walk_0006.mp4')
+cap = cv2.VideoCapture('D:/datasets/Walk-test/video/SJTU-SEIEE-170_Walk_0006.mp4')
 
 inference_size=(512, 512)
 width = 512

@@ -1,12 +1,20 @@
 import os
 import glob
-import abc
+from pathlib import Path
 import xml.etree.ElementTree as ET
 import json
 from config import settings
 from utils.boundingboxutils import BoundingBoxItem
 
 settings.init()
+
+
+def get_video_files_shad(configuration):
+    files_path = os.path.join(configuration.home_path, configuration.data_path)
+    files = os.listdir(files_path)
+    video_files_dict = {i: files[i].rsplit('.', 1)[0] for i in range(0, len(files))}
+    return video_files_dict
+
 
 def get_data(images_path, gt_path):
     all_img_files_list = []
@@ -25,10 +33,26 @@ def get_data(images_path, gt_path):
     # print(len(all_json_files_list))
     return all_img_files_list, all_json_files_list
 
+
+def get_annotation_by_video_frame(xmlPath, frame_number):
+
+    xmlpath = Path(xmlPath)
+
+    file_name = os.path.basename(xmlPath).split('.')[0] + '-{}.xml'
+    f_name = file_name.format(str(int(frame_number)).zfill(4))
+    file_name_for_metrics = f_name.split(".")[0]
+    f_name = os.path.join(xmlpath, f_name)
+    f_name = f_name.replace(os.sep, '/')
+    ground_truth = GroundTruthXml(f_name)
+
+    return ground_truth, file_name_for_metrics
+
+
 class GroundTruth:
     def __init__(self, path):
         self.path = path
         self.gt_items = []
+
 
 class GroundTruthXml(GroundTruth):
     def __init__(self, path, root_str_path = 'pedestriandescription/bndbox'):
@@ -62,7 +86,6 @@ class GroundTruthTxt(GroundTruth):
         super().__init__(path)
         self.read_file()
 
-
     def read_file(self):
         """
         1  track_id. All rows with the same ID belong to the same path.
@@ -81,6 +104,7 @@ class GroundTruthTxt(GroundTruth):
             for line in fl:
                 lst = line.split(' ')
                 self.gt_items.append(BoundingBoxItem(*lst[1:5], frame_no=lst[5], subject_out_of_frame=lst[6]))
+
 
 class GroundTruthJSON(GroundTruth):
     def __init__(self, path):

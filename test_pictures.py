@@ -33,7 +33,6 @@ def main():
     for index_img in range(len(images)):
         image = Image.open(images[index_img])
 
-
         json_file = jsons[index_img]
         ground_truth_annotations = groundtruthutils.GroundTruthJSON(json_file)
         if len(ground_truth_annotations.gt_items) == 0:
