@@ -9,44 +9,6 @@ from utils.boundingboxutils import BoundingBoxItem
 settings.init()
 
 
-def get_video_files_shad(configuration):
-    files_path = os.path.join(configuration.home_path, configuration.data_path)
-    files = os.listdir(files_path)
-    video_files_dict = {i: files[i].rsplit('.', 1)[0] for i in range(0, len(files))}
-    return video_files_dict
-
-
-def get_data(images_path, gt_path):
-    all_img_files_list = []
-    all_json_files_list = []
-
-    for every_folder in os.walk(images_path):
-        temp_list = [f for f in glob.glob(os.path.join(every_folder[0], '*.png'))]
-        temp_list.sort()
-        all_img_files_list += temp_list
-    for every_folder in os.walk(gt_path):
-        temp_list = [f for f in glob.glob(os.path.join(every_folder[0], '*.json'))]
-        temp_list.sort()
-        all_json_files_list += temp_list
-
-    # print(len(all_img_files_list))
-    # print(len(all_json_files_list))
-    return all_img_files_list, all_json_files_list
-
-
-def get_annotation_by_video_frame(xmlPath, frame_number):
-
-    xmlpath = Path(xmlPath)
-
-    file_name = os.path.basename(xmlPath).split('.')[0] + '-{}.xml'
-    f_name = file_name.format(str(int(frame_number)).zfill(4))
-    file_name_for_metrics = f_name.split(".")[0]
-    f_name = os.path.join(xmlpath, f_name)
-    f_name = f_name.replace(os.sep, '/')
-    ground_truth = GroundTruthXml(f_name)
-
-    return ground_truth, file_name_for_metrics
-
 
 class GroundTruth:
     def __init__(self, path):
